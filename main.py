@@ -23,18 +23,26 @@ def file_picker():
     return path
 
 def select_file_before():
+    global select_var_1
     global before_bin_stack_path
     file_path = file_picker()
 
     print("Selected file: ", file_path)
 
     before_bin_stack_path = file_path
+    if file_path:
+        select_var_1.set("Select Stack\nLoaded at "+file_path)
+
 
 def select_file_after():
+    global select_var_2
     global single_path
     file_path = file_picker()
     # after_bin_stack_path = 'images/NGC7000_120s_200Gain_Stacked_AfterBinning.fit'
     single_path = file_path
+
+    if file_path:
+        select_var_2.set("Select Single\nLoaded at "+file_path)
 
 def run():
     global before_bin_stack_path
@@ -43,11 +51,12 @@ def run():
     global single_noise
     global out_var
 
-    single_noise = analyze_fits(single_path)[0]
+    single_out = analyze_fits(single_path)
+    single_noise = single_out[0]
 
     before_bin_results = analyze_fits(file_path=before_bin_stack_path, is_stack=True, single_frame_noise=single_noise)
 
-    out_var.set("\n".join(before_bin_results[1]))
+    out_var.set("\nStack\n"+("\n".join(before_bin_results[1]))+"\n\nSingle\n"+("\n".join(single_out[1])))
     # print(before_bin_results)
 
 
@@ -65,8 +74,14 @@ run_button = ttk.Button(main_root, text="Run", command=run, style='Clam.TButton'
 run_button.pack(pady=1)
 
 #Add Select Buttons
-select_1_button = ttk.Button(main_root, text="Select Stack", command=select_file_before, style='Clam.TButton')
-select_2_button = ttk.Button(main_root, text="Select Single", command=select_file_after, style='Clam.TButton')
+select_var_1 = tk.StringVar()
+select_var_1.set("Select Stack")
+
+select_var_2 = tk.StringVar()
+select_var_2.set("Select Single")
+
+select_1_button = ttk.Button(main_root, text="Select Stack", command=select_file_before, style='Clam.TButton', textvariable=select_var_1)
+select_2_button = ttk.Button(main_root, text="Select Single", command=select_file_after, style='Clam.TButton', textvariable=select_var_2)
 
 #Pack Select Buttons
 select_2_button.pack(pady=1)
@@ -82,5 +97,5 @@ out_label.pack(pady=1)
 #Mainloop
 print(style.theme_names())
 
-style.theme_use("clam")
+style.theme_use("classic")
 main_root.mainloop()
