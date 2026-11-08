@@ -77,11 +77,19 @@ def analyze_fits(file_path, is_stack=False, single_frame_noise=None):
         avg_fwhm = 0
     
     #Print Results
+    out = []
+
     print(f"--- Analysis for: {file_path} ---\n")
+    out.append(f"--- Analysis for: {file_path} ---\n")
 
     print(f"--- HEADER INFO ---")
+    out.append(f"--- HEADER INFO ---")
+
     print(f"Object Name: {object_name}")
+    out.append(f"Object Name: {object_name}")
+
     print(f"Date: {date}")
+    out.append(f"Date: {date}")
 
     if not is_stack:
         print(f"Camera Gain: {gain}")
@@ -89,11 +97,21 @@ def analyze_fits(file_path, is_stack=False, single_frame_noise=None):
         print(f"Telescope: {telescope}")
         print(f"Exposure: {exposure} seconds")
         print(f"Focal Length: {focal_length}mm \n")
+
+        out.append(f"Camera Gain: {gain}")
+        out.append(f"Rotation: {rotation}")
+        out.append(f"Telescope: {telescope}")
+        out.append(f"Exposure: {exposure} seconds")
+        out.append(f"Focal Length: {focal_length}mm \n")
+
     else:
         print(f"Exposure: {exposure} hours")
         print(f"Software: {software}")
         print(f"# Images In Stack: {total_images}\n")
 
+        out.append(f"Exposure: {exposure} hours")
+        out.append(f"Software: {software}")
+        out.append(f"# Images In Stack: {total_images}\n")
 
     print(f"--- IMAGE SPECS ---")
     print(f"Calculated SNR:        {snr:.2f}")
@@ -101,19 +119,31 @@ def analyze_fits(file_path, is_stack=False, single_frame_noise=None):
     print(f"Background Noise (σ):  {robust_noise:.2f} ADU")
     print(f"Detected Stars:        {star_count}")
 
+    out.append(f"--- IMAGE SPECS ---")
+    out.append(f"Calculated SNR:        {snr:.2f}")
+    out.append(f"Background Sky Level:  {median:.1f} ADU")
+    out.append(f"Background Noise:  {robust_noise:.2f} ADU")
+    out.append(f"Detected Stars:    {star_count}")
+
 
     if star_count > 0:
         print(f"Average Star FWHM:     {avg_fwhm:.2f} pixels")
-        
+        out.append(f"Average Star FWHM:   {avg_fwhm:.2f} pixels")
+
     # 5. Calculate SNR Gain if comparing a stack to a single sub
     if is_stack and single_frame_noise:
         noise_reduction = single_frame_noise / robust_noise
         theoretical_frames = noise_reduction ** 2
         print(f"Stacking Efficiency:   Noise reduced by {noise_reduction:.1f} (Equivalent to stacking ~{int(theoretical_frames)} perfect frames)")
+        out.append(f"Stacking Efficiency: {noise_reduction:.1f} pixels")
+
     print("-" * 40)
     print ("\n")
+
+    out.append("-" * 40)
+    out.append("\n")
     
-    return robust_noise
+    return robust_noise,out
 
 # --- How to use it ---
 # 1. Run your single frame first to grab its noise floor
